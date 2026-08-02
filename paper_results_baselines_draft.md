@@ -82,23 +82,51 @@ per-class total.*
    happened; they are not citing *why* they believe it, in a way that
    matches the actual evidence, essentially ever.
 
-## Comparison to the trained overseer (partial -- pending multi-seed retrain)
+## Comparison to the trained overseer
 
 The single-seed reference run reported in `README.md`/`BLOG.md` -- a
 1.5B-parameter Qwen2.5 model, GRPO+LoRA fine-tuned with an explicit
-evidence-grounding reward term -- reaches 75.8% accuracy on the same
-held-out v3 set (`results/eval_lora_lr2e5_400.json`), below several frontier
-baselines on raw accuracy. Prior to this pass, `scripts/gen_gap_eval.py` (the
-script used to evaluate this checkpoint) did not track evidence-bonus hit
-rate at all -- only `accuracy`, `mean_reward`, `parse_error_rate` -- so the
-one number that matters most for this paper's argument was never actually
+evidence-grounding reward term (LR=2e-5, 400 steps, seed=42) -- reaches
+75.8% accuracy on the same held-out v3 set, below several frontier baselines
+on raw accuracy. Prior to this pass, `scripts/gen_gap_eval.py` (the script
+used to evaluate this checkpoint) did not track evidence-bonus hit rate at
+all -- only `accuracy`, `mean_reward`, `parse_error_rate` -- so the one
+number that matters most for this paper's argument had never actually been
 measured for the trained overseer, only implied by the aggregate
 `mean_reward` jump (0.44 to 0.90 vs. base). This has now been fixed
-(`evaluate_traces()` now emits per-class `evidence_bonus_hit_rate`,
-mirroring `eval_api_model.py`'s methodology exactly), so the retrained
-multi-seed checkpoints (3 seeds x 2 trace variants, currently running on
-Colab) can be evaluated on evidence-grounding directly and compared
-apples-to-apples against the 0.06% frontier baseline figure above.
+(`evaluate_traces()` emits per-class `evidence_bonus_hit_rate`, mirroring
+`eval_api_model.py`'s methodology exactly) and re-run on the original
+checkpoint (`results/eval_lora_lr2e5_400_seed42_with_bonus.json`):
+
+| Class          | Frontier baseline (aggregate, Table above) | Trained overseer (2e-5, seed=42) |
+| -------------- | ------------------------------------------- | ---------------------------------- |
+| REWARD_HACKER  | 0.0% (0/166 eligible across baselines)        | 0.0% (0/4 eligible)                 |
+| LAZY           | 0.0% (0/620 eligible)                          | 28.6% (2/7 eligible)                |
+| DECEIVER       | 0.06% (1/1,008 eligible)                       | **82.8%** (24/29 eligible)          |
+
+Accuracy reproduced bit-identically to the previously-committed result
+(0.7583333... exactly), a good sign that the checkpoint and eval pipeline
+are behaving deterministically despite running on different hardware
+(original run's hardware unknown/unrecorded vs. this re-eval on a local
+RTX 3050).
+
+**This is the paper's central positive result.** DECEIVER is the one class
+where the smoking-gun keyword is genuine claim content, not a structural
+marker (see Methods) -- and it's exactly the class where training produces a
+large, unambiguous jump: from a 0.06% baseline rate (statistically
+indistinguishable from zero across 8 models) to 82.8%. The small model is
+not just getting the right answer more often after training; when it does,
+it is now actually citing what it read. LAZY's smaller gain and
+REWARD_HACKER's null result are worth reporting honestly rather than
+folded into a single macro-averaged "grounding improved" claim -- the effect
+is real and large specifically where the reward signal requires real
+content grounding, and weak-to-absent on the two classes where the
+"keyword" is closer to a fixed class token.
+
+The retrained multi-seed checkpoints (3 seeds x 2 trace variants, LR=2e-5
+batch on Colab, in progress) will turn this single-seed result into a real
+seed-variance estimate and additionally test whether it holds on the
+LLM-realistic trace distribution, not just the original rule-based one.
 
 ---
 **TODO before this goes in the paper:**
