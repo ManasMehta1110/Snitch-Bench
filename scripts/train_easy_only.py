@@ -26,7 +26,7 @@ MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 USE_LORA = True
 MAX_COMPLETION_LENGTH = 256
 NUM_GENERATIONS = 4
-LEARNING_RATE = 5e-6
+DEFAULT_LEARNING_RATE = 2e-5  # matches the reported headline run (75.8% acc); 5e-6 was an earlier, weaker run
 BETA = 0.04
 PER_DEVICE_BATCH = 4     # TRL 1.2: batch_size must be >= num_generations
 GRAD_ACCUM = 2
@@ -173,6 +173,9 @@ def main():
     ap.add_argument("--seed", type=int, default=42,
                      help="controls data shuffle order AND model init / GRPO sampling randomness "
                           "(passed to GRPOConfig). Use a different value per seed run for real variance.")
+    ap.add_argument("--lr", type=float, default=DEFAULT_LEARNING_RATE,
+                     help=f"GRPO learning rate (default {DEFAULT_LEARNING_RATE}, matches the reported "
+                          "headline run).")
     args = ap.parse_args()
     
     allowed_variants = [int(v.strip()) for v in args.variants.split(",")]
@@ -225,7 +228,7 @@ def main():
     grpo_config = GRPOConfig(
         output_dir=args.output_dir,
         seed=args.seed,
-        learning_rate=LEARNING_RATE,
+        learning_rate=args.lr,
         per_device_train_batch_size=PER_DEVICE_BATCH,
         gradient_accumulation_steps=GRAD_ACCUM,
         num_generations=NUM_GENERATIONS,
@@ -266,7 +269,7 @@ def main():
         else:
             print(f"--resume passed but no checkpoint found in {args.output_dir}; starting fresh")
 
-    print(f"Starting training for {args.max_steps} steps -> {args.output_dir}")
+    print(f"Starting training for {args.max_steps} steps at lr={args.lr} -> {args.output_dir}")
     trainer.train(resume_from_checkpoint=resume_path)
 
     final_path = Path(args.output_dir) / "final"

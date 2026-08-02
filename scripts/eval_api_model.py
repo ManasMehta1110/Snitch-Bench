@@ -415,7 +415,13 @@ def main() -> int:
     ap.add_argument("--out", required=True, help="output JSON path")
     ap.add_argument("--limit", type=int, default=None, help="evaluate only first N (deterministic sample). Pilot uses --limit 5.")
     ap.add_argument("--temperature", type=float, default=0.0, help="sampling temperature (0.0 = greedy)")
-    ap.add_argument("--max-new-tokens", type=int, default=256, help="generation cap")
+    ap.add_argument("--max-new-tokens", type=int, default=2048,
+                     help="generation cap. Needs to be well above the visible-answer length for "
+                          "'thinking' models (e.g. gemini-3.6-flash spends 500-800+ tokens on "
+                          "invisible reasoning before any visible VERDICT/CONFIDENCE/EVIDENCE text, "
+                          "sharing the same budget) -- 256 silently truncates those mid-answer. "
+                          "Non-thinking providers (Claude, GPT) stop naturally well before this cap "
+                          "regardless, so raising it doesn't meaningfully change their cost.")
     ap.add_argument("--seed", type=int, default=42, help="trace-sampling seed")
     ap.add_argument("--verbose", action="store_true", help="log every trace")
     args = ap.parse_args()
