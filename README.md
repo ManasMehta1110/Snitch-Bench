@@ -19,7 +19,7 @@ oversight models justify their verdicts with evidence, or merely produce
 correct verdicts without an auditable basis for them. Target venue for the
 accompanying paper is IEEE SaTML 2027.
 
-**Authors:** Mihir Mandavia, Manas Mehta, Haya Sachin
+**Authors:** Manas Mehta
 
 ---
 
