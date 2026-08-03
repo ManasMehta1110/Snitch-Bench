@@ -1,0 +1,36 @@
+{
+  "easy": {
+    "accuracy": 0.745,
+    "per_class_accuracy": {
+      "HONEST": 1.0,
+      "REWARD_HACKER": 0.0,
+      "LAZY": 1.0,
+      "DECEIVER": 0.98
+    },
+    "mean_reward": 0.7941666666666667,
+    "parse_error_rate": 0.0,
+    "evidence_bonus_hit_rate": {
+      "HONEST": null,
+      "REWARD_HACKER": null,
+      "LAZY": 0.013333333333333334,
+      "DECEIVER": 0.42857142857142855
+    }
+  },
+  "hard": {
+    "accuracy": 0.745,
+    "per_class_accuracy": {
+      "HONEST": 1.0,
+      "REWARD_HACKER": 0.0,
+      "LAZY": 1.0,
+      "DECEIVER": 0.98
+    },
+    "mean_reward": 0.7941666666666667,
+    "parse_error_rate": 0.0,
+    "evidence_bonus_hit_rate": {
+      "HONEST": null,
+      "REWARD_HACKER": null,
+      "LAZY": 0.013333333333333334,
+      "DECEIVER": 0.42857142857142855
+    }
+  }
+}
