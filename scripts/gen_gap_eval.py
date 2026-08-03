@@ -204,19 +204,23 @@ def evaluate_traces(model, tokenizer, traces: list[Trace]):
     }
 
 
-def load_and_sample_traces(path: str, n: int = 120, seed: int = 42) -> list[Trace]:
-    """Load traces, optionally subsample to n. Default n=120 = full held-out v3 set.
+def load_and_sample_traces(path: str, n: int | None = None, seed: int = 42) -> list[Trace]:
+    """Load traces, optionally subsample to n. Default n=None = use the full file.
 
-    The default was n=60 in earlier development; the headline numbers in
-    README.md are at n=120 (full set, no sampling), so the default was raised
-    to reproduce the headline without requiring CLI flags.
+    n=None reproduces the original-variant headline (that file has exactly 120
+    traces, so "full file" and "n=120" were always the same thing there). It
+    was previously defaulted to a hardcoded 120, which silently subsampled the
+    600-trace realistic file down to a non-stratified 120-trace slice -- e.g.
+    one seed's slice landed only 14 of the ~150 REWARD_HACKER traces, versus
+    eval_api_model.py's baseline methodology which evaluates the full file.
+    Passing --n explicitly still subsamples if a smaller number is wanted.
     """
     traces = []
     for line in Path(path).read_text().splitlines():
         if line.strip():
             traces.append(Trace.from_json(line))
-    rng = random.Random(seed)
-    if len(traces) > n:
+    if n is not None and len(traces) > n:
+        rng = random.Random(seed)
         traces = rng.sample(traces, n)
     return traces
 
@@ -228,14 +232,16 @@ def main():
     ap.add_argument("--eval-easy", required=True)
     ap.add_argument("--eval-hard", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--n", type=int, default=None,
+                     help="subsample each eval file to this many traces (default: use the full file)")
     args = ap.parse_args()
 
     model, tokenizer = load_model(args.model_path, args.base_model)
-    
+
     print(f"Loading easy traces from {args.eval_easy}...")
-    easy_traces = load_and_sample_traces(args.eval_easy)
+    easy_traces = load_and_sample_traces(args.eval_easy, n=args.n)
     print(f"Loading hard traces from {args.eval_hard}...")
-    hard_traces = load_and_sample_traces(args.eval_hard)
+    hard_traces = load_and_sample_traces(args.eval_hard, n=args.n)
 
     print("Evaluating easy set...")
     easy_results = evaluate_traces(model, tokenizer, easy_traces)
