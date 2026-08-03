@@ -84,62 +84,76 @@ per-class total.*
 
 ## Comparison to the trained overseer
 
-The single-seed reference run reported in `README.md`/`BLOG.md` -- a
-1.5B-parameter Qwen2.5 model, GRPO+LoRA fine-tuned with an explicit
-evidence-grounding reward term (LR=2e-5, 400 steps, seed=42) -- reaches
-75.8% accuracy on the same held-out v3 set, below several frontier baselines
-on raw accuracy. Prior to this pass, `scripts/gen_gap_eval.py` (the script
-used to evaluate this checkpoint) did not track evidence-bonus hit rate at
-all -- only `accuracy`, `mean_reward`, `parse_error_rate` -- so the one
-number that matters most for this paper's argument had never actually been
-measured for the trained overseer, only implied by the aggregate
-`mean_reward` jump (0.44 to 0.90 vs. base). This has now been fixed
-(`evaluate_traces()` emits per-class `evidence_bonus_hit_rate`, mirroring
-`eval_api_model.py`'s methodology exactly) and re-run on the original
-checkpoint (`results/eval_lora_lr2e5_400_seed42_with_bonus.json`):
+We train Qwen2.5-1.5B with GRPO+LoRA (Methods) at two learning rates: the
+original hackathon single run used LR=2e-5 (400 steps, seed=42), which we
+treat as the headline configuration; we additionally ran a 3-seed x
+2-trace-distribution grid at LR=2e-5 (the true multi-seed headline data) and
+a matching grid at LR=5e-6 (kept as an explicit LR-robustness ablation, not
+discarded -- see Discussion). `scripts/gen_gap_eval.py` previously tracked
+only `accuracy`/`mean_reward`/`parse_error_rate` for the trained overseer,
+never evidence-bonus hit rate -- this has been fixed, and a separate
+non-stratified-subsampling bug (the realistic eval file was silently capped
+at a random 120-trace slice of its 600) has also been fixed; all numbers
+below are post-fix, full-file evaluations.
 
-| Class          | Frontier baseline (aggregate, Table above) | Trained overseer (2e-5, seed=42) |
-| -------------- | ------------------------------------------- | ---------------------------------- |
-| REWARD_HACKER  | 0.0% (0/166 eligible across baselines)        | 0.0% (0/4 eligible)                 |
-| LAZY           | 0.0% (0/620 eligible)                          | 28.6% (2/7 eligible)                |
-| DECEIVER       | 0.06% (1/1,008 eligible)                       | **82.8%** (24/29 eligible)          |
+**LR=2e-5, original trace distribution (n=3 seeds, n=120 traces/seed):**
 
-Accuracy reproduced bit-identically to the previously-committed result
-(0.7583333... exactly), a good sign that the checkpoint and eval pipeline
-are behaving deterministically despite running on different hardware
-(original run's hardware unknown/unrecorded vs. this re-eval on a local
-RTX 3050).
+| Class          | Frontier baseline (aggregate) | Trained overseer, mean +/- std | Raw (seed 1/2/3) |
+| -------------- | ------------------------------ | -------------------------------- | ------------------ |
+| REWARD_HACKER  | 0.0% (0/166 eligible)            | 12.8% +/- 13.7%                    | 27.3%, 11.1%, 0.0%   |
+| LAZY           | 0.0% (0/620 eligible)             | 28.3% +/- 14.8%                    | 42.9%, 28.6%, 13.3%  |
+| DECEIVER       | 0.06% (1/1,008 eligible)          | **74.1% +/- 15.1%**                 | 90.0%, 72.4%, 60.0%   |
 
-**This is the paper's central positive result.** DECEIVER is the one class
+**LR=2e-5, realistic trace distribution (n=3 seeds, full n=600 traces/seed):**
+
+| Class          | Frontier baseline (aggregate) | Trained overseer, mean +/- std | Raw (seed 1/2/3) |
+| -------------- | ------------------------------ | -------------------------------- | ------------------ |
+| REWARD_HACKER  | 0.0% (0/166 eligible)            | undefined (2/3 seeds: 0% class. accuracy, no eligible traces) | -, -, 0.0% |
+| LAZY           | 0.0% (0/620 eligible)             | 34.5% +/- 52.2% (not a trend -- noise) | 94.6%, 1.3%, 7.4% |
+| DECEIVER       | 0.06% (1/1,008 eligible)          | **52.0% +/- 14.5%**                 | 68.7%, 42.9%, 44.4%   |
+
+The single-seed reference checkpoint (seed=42, original distribution only)
+independently reaches 82.8% DECEIVER grounding (`accuracy` reproduced
+bit-identically to the previously-published 75.8% figure, a good
+determinism sanity check) -- consistent with, though a bit above, the 3-seed
+mean of 74.1%, as expected for one sample from a distribution with
+substantial seed variance.
+
+**This is the paper's central positive result, now with real multi-seed
+support on two independent trace distributions.** DECEIVER is the one class
 where the smoking-gun keyword is genuine claim content, not a structural
-marker (see Methods) -- and it's exactly the class where training produces a
-large, unambiguous jump: from a 0.06% baseline rate (statistically
-indistinguishable from zero across 8 models) to 82.8%. The small model is
-not just getting the right answer more often after training; when it does,
-it is now actually citing what it read. LAZY's smaller gain and
-REWARD_HACKER's null result are worth reporting honestly rather than
-folded into a single macro-averaged "grounding improved" claim -- the effect
-is real and large specifically where the reward signal requires real
-content grounding, and weak-to-absent on the two classes where the
-"keyword" is closer to a fixed class token.
-
-The retrained multi-seed checkpoints (3 seeds x 2 trace variants, LR=2e-5
-batch on Colab, in progress) will turn this single-seed result into a real
-seed-variance estimate and additionally test whether it holds on the
-LLM-realistic trace distribution, not just the original rule-based one.
+marker (see Methods) -- and it is exactly the class where training produces
+a large, consistent-in-direction jump on *both* distributions: from a 0.06%
+baseline (indistinguishable from zero across 8 models) to 74.1% (original)
+and 52.0% (realistic). The drop on the harder, LLM-generated distribution is
+expected and, if anything, reassuring -- a real effect degrading gracefully
+under a harder distribution is more credible than one that doesn't move at
+all. REWARD_HACKER and LAZY tell an honest, less flattering story: LAZY's
+per-seed numbers swing too widely to support any specific point estimate
+(std exceeds the mean in both distributions), and REWARD_HACKER's
+classification accuracy on the realistic distribution is so low that the
+evidence-bonus metric is undefined for most seeds -- the reward can't teach
+grounding for verdicts the model isn't getting right in the first place.
+We report all three plainly rather than average them into a single
+"grounding improved" number.
 
 ---
 **TODO before this goes in the paper:**
-- Add the multi-seed retrained-overseer evidence-bonus numbers once Colab
-  finishes and the fixed `gen_gap_eval.py` has been run on all 6 checkpoints.
-- Decide whether to report per-seed variance (mean +/- std) or all seeds
-  individually in the main table, given n=3 per variant.
+- LR=5e-6 ablation grid: original-variant results in, realistic-variant
+  evals in progress (lower priority, running after the LR=2e-5 data above).
+  Add once complete.
+- Decide on final table format for the paper itself (mean+-std vs. all
+  seeds individually) -- current draft shows both, pick one before
+  submission for space.
 - Confirm whether Llama/Qwen should be re-run on the realistic set too for
-  table symmetry, or whether the paper explicitly scopes the realistic-set
-  comparison to the 3 API-only providers (cost/time tradeoff -- open-weight
-  local runs are free, this is a scope decision not a budget one).
+  table symmetry in the *baseline* comparison, or whether the paper
+  explicitly scopes the realistic-set baseline comparison to the 3 API-only
+  providers (cost/time tradeoff -- open-weight local runs are free, this is
+  a scope decision not a budget one).
 - Cross-check the Wilson CIs / significance test convention from README.md
-  (z=3.14, p=0.0017 style) and apply the same convention here for consistency.
-- Convert this draft's inline reasoning into proper prose paragraphs once
-  the multi-seed numbers land (right now some of this reads like analysis
-  notes, which is intentional at this stage but should tighten up).
+  (z=3.14, p=0.0017 style) and apply an equivalent convention to the
+  multi-seed evidence-bonus numbers (e.g. a paired test against the 0.06%
+  baseline rate) before submission -- current numbers are mean+-std only,
+  no formal significance test yet.
+- Convert this draft's inline reasoning into proper prose paragraphs for
+  the final manuscript.
