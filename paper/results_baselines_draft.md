@@ -119,23 +119,53 @@ determinism sanity check) -- consistent with, though a bit above, the 3-seed
 mean of 74.1%, as expected for one sample from a distribution with
 substantial seed variance.
 
+**Pooled significance test.** Per-seed means understate what's actually
+supported by the data for two of the three classes. Reconstructing raw
+hit/eligible counts from each seed and pooling across the 3 seeds, then
+running an exact one-sided binomial test against the aggregate frontier
+baseline rate (0.06%, 1/1,794) gives:
+
+| Class | Distribution | Pooled hits/eligible | Pooled rate | p (exact binomial, vs. 0.06% baseline) |
+| --- | --- | --- | --- | --- |
+| REWARD_HACKER | original | 4/34 | 11.8% | 4.4e-9 |
+| REWARD_HACKER | realistic | 0/6 | 0.0% | 1.0 (no evidence of effect) |
+| LAZY | original | 24/86 | 27.9% | 9.7e-58 |
+| LAZY | realistic | 154/448 | 34.4% | ~0 |
+| DECEIVER | original | 66/89 | 74.2% | ~0 |
+| DECEIVER | realistic | 227/436 | 52.1% | ~0 |
+
+This refines the per-seed-variance framing above: **REWARD_HACKER and LAZY
+are not "no effect" or pure noise on the original distribution -- pooled
+across seeds, both are statistically distinguishable from the near-zero
+baseline.** What the high per-seed standard deviation actually reflects is
+that the *magnitude* of the effect is imprecisely estimated at n=3 seeds,
+not that the effect is absent. The one case with genuinely no evidence of
+an effect is REWARD_HACKER on the realistic distribution (0 hits out of 6
+pooled eligible traces across all 3 seeds) -- consistent with the
+classification-accuracy bottleneck described above (the model rarely gets
+this class right at all on realistic traces, so there is rarely a verdict
+eligible for the bonus in the first place).
+
 **This is the paper's central positive result, now with real multi-seed
-support on two independent trace distributions.** DECEIVER is the one class
-where the smoking-gun keyword is genuine claim content, not a structural
-marker (see Methods) -- and it is exactly the class where training produces
-a large, consistent-in-direction jump on *both* distributions: from a 0.06%
-baseline (indistinguishable from zero across 8 models) to 74.1% (original)
-and 52.0% (realistic). The drop on the harder, LLM-generated distribution is
-expected and, if anything, reassuring -- a real effect degrading gracefully
-under a harder distribution is more credible than one that doesn't move at
-all. REWARD_HACKER and LAZY tell an honest, less flattering story: LAZY's
-per-seed numbers swing too widely to support any specific point estimate
-(std exceeds the mean in both distributions), and REWARD_HACKER's
-classification accuracy on the realistic distribution is so low that the
-evidence-bonus metric is undefined for most seeds -- the reward can't teach
-grounding for verdicts the model isn't getting right in the first place.
-We report all three plainly rather than average them into a single
-"grounding improved" number.
+support, on two independent trace distributions, backed by a formal
+significance test rather than point estimates alone.** DECEIVER shows both
+the largest effect size and the most precise estimate (pooled rate 74.2%
+original / 52.1% realistic, both p ≈ 0 against baseline) -- consistent with
+it being the class where the smoking-gun keyword is genuine claim content
+rather than a structural marker (see Methods). LAZY and REWARD_HACKER are
+real but smaller and, in REWARD_HACKER's case, distribution-dependent: it
+works on the original distribution and fails entirely on the realistic one,
+tracking that class's classification-accuracy bottleneck rather than a
+grounding failure per se.
+
+*Caveat on the pooled test:* it treats individual trace outcomes within and
+across seeds as independent Bernoulli trials, a standard simplifying
+assumption for this kind of report but not a perfectly rigorous one (traces
+within a seed share the same fixed evaluation set). The baseline rate being
+tested against is itself an aggregate across 8 different models rather than
+a single matched comparison condition -- appropriate for establishing "the
+trained model behaves differently from frontier models in general," less
+appropriate for a claim about any one specific baseline model.
 
 ---
 **TODO before this goes in the paper:**

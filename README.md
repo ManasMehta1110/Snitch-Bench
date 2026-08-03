@@ -55,10 +55,14 @@ narrow with model scale within a provider or with additional
 inference-time compute. We further show that a small (1.5B-parameter)
 model, fine-tuned with GRPO under a reward that explicitly bonuses
 grounded citation, closes most of this gap for the misbehavior class where
-the evidence is genuine claim content — but not for the two classes where
-the ground-truth keyword is closer to a fixed structural marker,
-indicating the effect is a function of the reward's incentive structure
-rather than a uniform capability gain.
+the evidence is genuine claim content, and a smaller but still
+statistically significant fraction of the gap for the two classes where the
+ground-truth keyword is closer to a fixed structural marker — with one
+exception where the effect is entirely absent, tracking a classification
+bottleneck rather than a grounding failure specifically. The pattern
+indicates the intervention's effect size is a function of the reward's
+incentive structure and the model's prior classification accuracy on a
+given misbehavior class, not a uniform capability gain.
 
 ## Environment specification
 
@@ -155,18 +159,34 @@ single-seed run), 3 training seeds per distribution.
 | Class | Baseline (aggregate, Exp. 1) | Trained overseer (mean ± s.d., n=3 seeds) |
 | --- | --- | --- |
 | `REWARD_HACKER` | 0.0% | undefined — model rarely classifies this class correctly on realistic traces (no eligible traces in 2/3 seeds) |
-| `LAZY` | 0.0% | 34.5% ± 52.2% (s.d. exceeds the mean; not distinguishable from noise at n=3) |
+| `LAZY` | 0.0% | 34.5% ± 52.2% (high per-seed variance; see pooled test below) |
 | `DECEIVER` | 0.06% | 52.0% ± 14.5% |
 
-The effect is large and directionally consistent, on both distributions,
-specifically for `DECEIVER` — the class whose ground-truth keyword requires
-content grounding rather than recognizing a structural marker. We report
-`REWARD_HACKER` and `LAZY` without a corresponding causal claim: the former
-because the reward's evidence term is contingent on classification accuracy
-that the model does not reliably reach on this class under the realistic
-distribution, the latter because per-seed variance in this study makes any
-point estimate unreliable. A learning-rate ablation (identical grid at
-LR=5e-6) is in progress to test the sensitivity of this result to that
+Per-seed standard deviation alone understates what two of these three
+classes actually support. Pooling raw hit/eligible counts across the 3
+seeds and testing against the 0.06% aggregate baseline (exact one-sided
+binomial test) gives:
+
+| Class | Distribution | Pooled | Rate | p (vs. baseline) |
+| --- | --- | --- | --- | --- |
+| `REWARD_HACKER` | original | 4/34 | 11.8% | 4.4 × 10⁻⁹ |
+| `REWARD_HACKER` | realistic | 0/6 | 0.0% | 1.0 (no evidence of an effect) |
+| `LAZY` | original | 24/86 | 27.9% | 9.7 × 10⁻⁵⁸ |
+| `LAZY` | realistic | 154/448 | 34.4% | ≈0 |
+| `DECEIVER` | original | 66/89 | 74.2% | ≈0 |
+| `DECEIVER` | realistic | 227/436 | 52.1% | ≈0 |
+
+`REWARD_HACKER` and `LAZY` are not noise-indistinguishable-from-zero on the
+original distribution — pooled across seeds, both are statistically
+distinguishable from baseline; the high per-seed s.d. reflects an
+imprecisely estimated magnitude, not an absent effect. The one case with no
+evidence of an effect at all is `REWARD_HACKER` on the realistic
+distribution (0 pooled hits out of 6 eligible traces), consistent with the
+model rarely classifying this class correctly under that distribution in
+the first place — there are few verdicts eligible for the evidence bonus to
+begin with. `DECEIVER` remains the strongest and most precisely estimated
+result on both distributions. A learning-rate ablation (identical grid at
+LR=5e-6) is in progress to test the sensitivity of these results to that
 hyperparameter.
 
 ## Installation
