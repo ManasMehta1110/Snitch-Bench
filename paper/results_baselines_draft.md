@@ -167,6 +167,38 @@ a single matched comparison condition -- appropriate for establishing "the
 trained model behaves differently from frontier models in general," less
 appropriate for a claim about any one specific baseline model.
 
+## Learning-rate ablation (LR=5e-6)
+
+The same 3-seed x 2-distribution grid, trained at LR=5e-6 instead of 2e-5
+(all other hyperparameters, including step count, identical), gives a
+sharp negative result:
+
+| Class | Distribution | Trained overseer (mean ± s.d., n=3 seeds) |
+| --- | --- | --- |
+| REWARD_HACKER | original | no eligible traces in any seed |
+| REWARD_HACKER | realistic | no eligible traces in any seed |
+| LAZY | original | 0.0% ± 0.0% (raw: 0.0, 0.0, 0.0) |
+| LAZY | realistic | 0.0% ± 0.0% (raw: 0.0, 0.0, 0.0) |
+| DECEIVER | original | 0.0% ± 0.0% (raw: 0.0, 0.0, 0.0) |
+| DECEIVER | realistic | 0.26% ± 0.45% (raw: 0.79%, 0.0%, 0.0%) |
+
+At this learning rate, evidence-grounding is statistically indistinguishable
+from the 0.06% frontier baseline across every class, every seed, and both
+trace distributions -- verdict accuracy is still reasonable (70.3% ± 0.5%
+original, 69.2% ± 1.1% realistic, comparable to several frontier baselines)
+but the model has not learned to ground its verdicts at all. This is not a
+smaller version of the LR=2e-5 effect; it is its near-total absence.
+
+This is a clean, valuable negative result for the paper's argument: the
+evidence-grounding capability is not a byproduct of GRPO training with this
+reward function in general, nor of reaching a particular accuracy level --
+it requires a training configuration with enough policy movement to
+actually shift citation behavior, not just classification behavior. A
+learning rate 4x smaller, with identical steps, data, and reward, produces
+a materially better-than-random classifier that grounds nothing. Grounding
+is a separate optimization target that the reward makes *reachable*, not
+one it guarantees for any configuration that improves accuracy.
+
 ---
 **TODO before this goes in the paper:**
 - LR=5e-6 ablation grid: original-variant results in, realistic-variant

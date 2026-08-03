@@ -185,9 +185,18 @@ distribution (0 pooled hits out of 6 eligible traces), consistent with the
 model rarely classifying this class correctly under that distribution in
 the first place — there are few verdicts eligible for the evidence bonus to
 begin with. `DECEIVER` remains the strongest and most precisely estimated
-result on both distributions. A learning-rate ablation (identical grid at
-LR=5e-6) is in progress to test the sensitivity of these results to that
-hyperparameter.
+result on both distributions.
+
+**Learning-rate ablation.** The identical grid trained at LR=5e-6 (4x
+smaller, otherwise unchanged) shows a sharp negative result: evidence
+grounding is statistically indistinguishable from the 0.06% baseline across
+every class, every seed, and both distributions (0.0% for `LAZY` and
+`DECEIVER` on all 3 original seeds; 0.0-0.8% on realistic), despite verdict
+accuracy remaining reasonable (70.3% ± 0.5% original, comparable to several
+frontier baselines). Grounding is not a byproduct of training toward better
+accuracy with this reward in general — it requires a configuration with
+enough policy movement to shift citation behavior specifically, not just
+classification behavior.
 
 ## Installation
 
