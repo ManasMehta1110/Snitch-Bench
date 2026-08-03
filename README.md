@@ -272,7 +272,7 @@ tests/        environment correctness tests
 ```bibtex
 @misc{snitch2026,
   title        = {The Snitch: Measuring Evidence-Grounded AI Oversight},
-  author       = {Mandavia, Mihir and Mehta, Manas and Sachin, Haya},
+  author       = {Mehta, Manas},
   year         = {2026},
   howpublished = {\url{https://github.com/ManasMehta1110/Snitch-Bench}},
   note         = {Preprint in preparation, target venue IEEE SaTML 2027}
