@@ -385,6 +385,7 @@ A100 (Google Colab Pro); each 400-step run takes approximately 80--100
 minutes.
 
 \section{Results}
+\label{sec:results}
 
 \subsection{A worked example}
 
@@ -655,6 +656,28 @@ learning-rate ablation shows requires sufficient policy movement to emerge
 at all. Correct verdicts are not evidence that an oversight process is
 auditable; that auditability appears to be trainable, but not uniformly or
 automatically.
+
+\section*{LLM Usage Considerations}
+
+This work made extensive use of Claude (Anthropic), accessed via Claude
+Code, as a writing and engineering assistant throughout the project. The
+author designed the research question, the environment and reward
+function, the experimental protocol (which models to evaluate, the
+original/realistic trace distribution split, the multi-seed and
+learning-rate-ablation design), and directed every methodological decision
+reported in this paper. Claude was used to draft prose in every section of
+the manuscript, to write and debug the supporting code (the environment
+implementation, evaluation and training scripts, and the statistical
+analysis in Section~\ref{sec:results}, including the Wilson confidence
+intervals and the pooled binomial significance tests), to generate the
+figures, and to assist with literature search for the citations in Related
+Work. All code was run by the author on infrastructure the author
+controlled (local GPU, Kaggle, Google Colab), and all numbers reported in
+this paper were independently verified by the author against the raw
+result files and checkpoint logs before being written up. The author takes
+full responsibility for the accuracy, originality, and integrity of all
+claims, data, and code in this work, including any content produced with
+LLM assistance.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
