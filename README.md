@@ -51,7 +51,7 @@ introduce an environment in which an overseer classifies a completed
 tool-use trace as honest or one of three misbehaviors, and is scored
 separately on (a) verdict correctness and (b) whether its cited evidence
 names the correct trace step and the correct supporting detail. Evaluating
-8 frontier models across 3 providers, on two independently constructed
+7 frontier models spanning 5 organizations, on two independently constructed
 trace distributions, we find verdict accuracy is high (often near-ceiling)
 while grounded justification is nearly absent: 1 of 1,794 correctly
 classified misbehavior verdicts (0.06%) is grounded. The gap does not
@@ -141,7 +141,7 @@ need to verify the claim independently.
 
 ## Experiment 1: frontier-model baselines
 
-8 models, 3 providers, identical 3-shot prompt, identical trace rendering,
+7 models, 5 organizations, identical 3-shot prompt, identical trace rendering,
 identical reward function — 10 model × distribution configurations.
 
 | Model | Distribution | Accuracy | `REWARD_HACKER` grounded | `LAZY` grounded | `DECEIVER` grounded |

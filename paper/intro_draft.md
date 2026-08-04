@@ -29,9 +29,10 @@ a ground-truth "smoking gun": the exact step and keyword an honest audit
 would need to reference. This lets us measure grounding directly and
 cheaply, rather than relying on human judgment of explanation quality.
 
-**Finding 1.** We evaluate 8 frontier models across 3 providers (OpenAI,
-Anthropic, Google) on two independently-constructed trace distributions --
-a rule-based synthetic one and an LLM-generated one built to look
+**Finding 1.** We evaluate 7 frontier models spanning 5 organizations -- 3
+major API providers (OpenAI, Anthropic, Google) and 2 open-weight model
+families (Meta's Llama, Alibaba's Qwen) -- on two independently-constructed
+trace distributions -- a rule-based synthetic one and an LLM-generated one built to look
 naturalistic while preserving identical ground-truth labels. Verdict
 accuracy is high, often near-ceiling. Evidence grounding is not: across
 1,794 correctly-classified misbehavior verdicts, only 1 (0.06%) cites both
@@ -63,7 +64,7 @@ more than a fixed pattern to memorize.
    AI oversight, separable from classification accuracy, with a
    ground-truth-preserving methodology for generating naturalistic (not
    obviously synthetic) test traces.
-2. An empirical measurement, at a scale and breadth (8 models, 3 providers,
+2. An empirical measurement, at a scale and breadth (7 models, 5 organizations,
    2 independent trace distributions) that rules out the most obvious
    objections (small model set, single trace style, scale would fix it),
    that this evidence-grounding gap is close to universal in current

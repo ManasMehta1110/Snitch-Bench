@@ -5,6 +5,8 @@
 % actual required class, not a stand-in. Research papers: up to 12 pages of
 % body text, unlimited additional space for references/well-marked appendices.
 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{cite}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -33,8 +35,8 @@ could check independently, not merely correct by construction. We introduce
 an environment in which an overseer classifies a completed tool-use trace as
 honest or one of three misbehaviors, and is scored separately on (a) verdict
 correctness and (b) whether its cited evidence names the correct trace step
-and the correct supporting detail. Evaluating 8 frontier models across 3
-providers, on two independently constructed trace distributions, we find
+and the correct supporting detail. Evaluating 7 frontier models spanning 5
+organizations, on two independently constructed trace distributions, we find
 verdict accuracy is high (often near-ceiling) while grounded justification is
 nearly absent: 1 of 1{,}794 correctly classified misbehavior verdicts
 (0.06\%) is grounded. The gap does not narrow with model scale within a
@@ -85,10 +87,12 @@ a ground-truth ``smoking gun'': the exact step and keyword an honest audit
 would need to reference. This lets us measure grounding directly and
 cheaply, rather than relying on human judgment of explanation quality.
 
-\textbf{Finding 1.} We evaluate 8 frontier models across 3 providers
-(OpenAI, Anthropic, Google) on two independently-constructed trace
-distributions -- a rule-based synthetic one and an LLM-generated one built
-to look naturalistic while preserving identical ground-truth labels.
+\textbf{Finding 1.} We evaluate 7 frontier models spanning 5 organizations
+-- 3 major API providers (OpenAI, Anthropic, Google) and 2 open-weight
+model families (Meta's Llama, Alibaba's Qwen) -- on two
+independently-constructed trace distributions -- a rule-based synthetic
+one and an LLM-generated one built to look naturalistic while preserving
+identical ground-truth labels.
 Verdict accuracy is high, often near-ceiling. Evidence grounding is not:
 across 1{,}794 correctly-classified misbehavior verdicts, only 1 (0.06\%)
 cites both the correct step and the correct keyword. The gap does not close
@@ -123,8 +127,8 @@ effect requires sufficient policy movement to emerge at all.
     in AI oversight, separable from classification accuracy, with a
     ground-truth-preserving methodology for generating naturalistic (not
     obviously synthetic) test traces.
-  \item An empirical measurement, at a scale and breadth (8 models, 3
-    providers, 2 independent trace distributions) that rules out the most
+  \item An empirical measurement, at a scale and breadth (7 models, 5
+    organizations, 2 independent trace distributions) that rules out the most
     obvious objections (small model set, single trace style, scale would fix
     it), that this evidence-grounding gap is close to universal in current
     frontier models used as overseers.
@@ -165,9 +169,10 @@ taxonomy, with no attempt to control for this) and ask a separate question
 accompanying justification actually cite the evidence that makes the
 verdict correct? Across every frontier model and both our synthetic and
 LLM-generated trace sets, we find the answer is essentially never: across
-10 model $\times$ dataset baseline configurations (8 distinct models across
-3 providers -- OpenAI, Anthropic, Google -- evaluated on both a rule-based
-synthetic trace distribution and an independently LLM-generated realistic
+10 model $\times$ dataset baseline configurations (7 distinct models
+spanning 5 organizations -- OpenAI, Anthropic, Google, Meta, and Alibaba --
+evaluated on both a rule-based synthetic trace distribution and an
+independently LLM-generated realistic
 one), only 1 of 1{,}794 correctly-classified misbehavior verdicts (0.06\%)
 grounds its verdict in both the correct step number and the specific
 evidence keyword. This suggests weak-to-strong oversight protocols that
@@ -226,7 +231,7 @@ study.
 
 Our contribution is not a new oversight protocol, faithfulness metric, or
 process reward model. It is an empirical measurement, replicated across
-three frontier model families (GPT, Claude, Gemini; 8 distinct
+five frontier model families (GPT, Claude, Gemini, Llama, Qwen; 7 distinct
 models/versions) and two independently-constructed trace distributions
 (rule-based synthetic and LLM-generated realistic), that a specific and
 checkable form of oversight failure -- correct verdicts without correct
@@ -640,7 +645,7 @@ independently-built trace distributions.
 \section{Conclusion}
 
 We measured whether AI overseers ground their verdicts in checkable
-evidence, not just get the verdict right, across 8 frontier models and two
+evidence, not just get the verdict right, across 7 frontier models and two
 independently-constructed trace distributions, and found grounding is
 nearly absent (0.06\%) despite high verdict accuracy. Training a small
 model with an explicit evidence-grounding reward closes most of this gap

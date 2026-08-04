@@ -20,7 +20,7 @@ Two trace distributions are tested:
   smoking-gun step/keyword position), addressing the concern that
   fully-templated traces are trivially distinguishable as synthetic.
 
-8 distinct models across 3 providers: GPT-4o, GPT-4o-mini (OpenAI);
+7 distinct models across 5 organizations: GPT-4o, GPT-4o-mini (OpenAI);
 Claude Haiku 4.5, Claude Sonnet 4.5 (Anthropic); Gemini 3.6 Flash (Google);
 Llama-3.1-8B-Instruct, Qwen2.5-7B-Instruct (open-weight, run locally). The
 first six were evaluated on both trace distributions where budget allowed;

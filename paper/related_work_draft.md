@@ -25,7 +25,7 @@ ask a separate question -- when the overseer is *correct*, does its accompanying
 justification actually cite the evidence that makes the verdict correct?
 Across every frontier model and both our synthetic and LLM-generated trace
 sets, we find the answer is essentially never: across 10 model x dataset
-baseline configurations (8 distinct models across 3 providers -- OpenAI,
+baseline configurations (7 distinct models spanning 5 organizations -- OpenAI,
 Anthropic, Google -- evaluated on both a rule-based synthetic trace
 distribution and an independently LLM-generated realistic one), only 1 of
 1,794 correctly-classified misbehavior verdicts (0.06%) grounds its verdict
@@ -85,7 +85,7 @@ study.
 
 Our contribution is not a new oversight protocol, faithfulness metric, or
 process reward model. It is an empirical measurement, replicated across three
-frontier model families (GPT, Claude, Gemini; 8 distinct models/versions) and
+frontier model families (GPT, Claude, Gemini; 7 distinct models/versions) and
 two independently-constructed trace distributions (rule-based synthetic and
 LLM-generated realistic), that a specific and checkable form of oversight
 failure -- correct verdicts without correct evidence grounding -- is close to
