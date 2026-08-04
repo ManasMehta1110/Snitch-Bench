@@ -20,7 +20,7 @@
 
 \author{
   \IEEEauthorblockN{Manas Mehta}
-  \IEEEauthorblockA{}
+  \IEEEauthorblockA{Independent Researcher}
 }
 
 \maketitle
@@ -368,6 +368,16 @@ GRPO sampling / data shuffle order, not the held-out eval set) $\times$ 2
 trace distributions $\times$ 2 learning rates (2e-5, the configuration
 matching the original single-seed reference run, and 5e-6, kept as an
 explicit ablation) $= 12$ runs.
+
+\subsection{Reproducibility}
+
+Code, environment, trace data, and all raw evaluation results are available
+at \url{https://github.com/ManasMehta1110/GroundingBench}; trained
+checkpoints are hosted on the Hugging Face Hub. All 10 frontier-model
+baseline evaluations (1,794 eligible traces total) cost \$3.64 combined in
+API usage. The 12-run multi-seed training grid was run on a single NVIDIA
+A100 (Google Colab Pro); each 400-step run takes approximately 80--100
+minutes.
 
 \section{Results}
 
