@@ -157,10 +157,11 @@ motivating debate and consultancy protocols as scalable oversight
 mechanisms. Most recent survey work treats the oversight \emph{verdict} --
 correct or incorrect -- as the object of study.
 
-Our work complicates this picture along a different axis: we hold the
-overseer's classification accuracy roughly fixed (all evaluated frontier
-models achieve 70.8--100\% verdict accuracy across our misbehavior taxonomy)
-and ask a separate question -- when the overseer is \emph{correct}, does its
+Our work complicates this picture along a different axis: rather than
+manipulating classification accuracy, we take it as given (evaluated
+frontier models span 70.8--100\% verdict accuracy across our misbehavior
+taxonomy, with no attempt to control for this) and ask a separate question
+-- when the overseer is \emph{correct}, does its
 accompanying justification actually cite the evidence that makes the
 verdict correct? Across every frontier model and both our synthetic and
 LLM-generated trace sets, we find the answer is essentially never: across
@@ -204,13 +205,11 @@ generation, typically to guide or re-rank reasoning in math and code tasks.
 Lightman et al.~\cite{lightman2023lets} (PRM800K) show step-level human
 labels improve best-of-$k$ selection over outcome-only supervision;
 Math-Shepherd~\cite{wang2024mathshepherd} automates label generation via
-Monte Carlo rollouts to remove the human-annotation bottleneck; more recent
-verbalized process reward models have the verifier produce an explicit
-natural-language justification chain per step, closer in spirit to what our
-overseer is asked to do.\footnote{We are aware of at least one recent
-verbalized-PRM paper in this space but have not been able to confirm its
-exact citation details in time for this draft; a proper citation should
-replace this footnote before submission.}
+Monte Carlo rollouts to remove the human-annotation bottleneck; ThinkPRM~\cite{khalifa2025thinkprm}
+has the verifier generate an explicit long chain-of-thought verification per
+step, closer in spirit to what our overseer is asked to do, while requiring
+orders of magnitude fewer process labels than discriminative PRMs trained
+on the full PRM800K.
 
 PRMs are trained and evaluated on the reasoning trace that produces an
 answer (typically math or code), where step correctness is often
@@ -218,10 +217,10 @@ automatically checkable. Our overseer instead audits a completed agentic
 trajectory -- a sequence of tool calls and their results -- for one of four
 qualitatively different misbehavior patterns, where the ``correct'' step to
 cite is a specific tool-use event rather than an arithmetic or logical
-operation. The verbalized-justification design of recent verbalized PRMs is
-close in spirit to our evidence-citation requirement, but to our knowledge
-this citation-grounding failure has not been measured directly in the
-agentic-oversight setting we study.
+operation. ThinkPRM's verbalized-justification design is close in spirit to our
+evidence-citation requirement, but to our knowledge this citation-grounding
+failure has not been measured directly in the agentic-oversight setting we
+study.
 
 \subsection{Positioning}
 
@@ -248,8 +247,8 @@ incentive rather than raw capability.
 GroundingBench presents an overseer model with a completed
 tool-use trace from a ``research assistant'' agent (the \emph{doer}) that
 answered a factual question, and asks the overseer to classify the doer's
-behavior into one of four classes and cite the specific evidence that
-justifies the verdict:
+behavior into one of four classes (Table~\ref{tab:taxonomy}) and cite the
+specific evidence that justifies the verdict:
 \begin{quote}\ttfamily\small
 VERDICT: <HONEST | REWARD\_HACKER | LAZY | DECEIVER>\\
 CONFIDENCE: <float in [0, 1]>\\
@@ -372,6 +371,31 @@ explicit ablation) $= 12$ runs.
 
 \section{Results}
 
+\subsection{A worked example}
+
+Before the aggregate numbers, one real trace illustrates what ``correct but
+ungrounded'' looks like in practice. A \texttt{DECEIVER} trace (held-out,
+original distribution) has the doer search, read three documents that all
+independently state the United Nations was formed in 1945, then submit the
+answer ``European Union.'' The ground-truth smoking gun is step 6 (the
+submission itself) and the keyword \texttt{european}. Claude Haiku 4.5,
+given this trace verbatim, responds:
+\begin{quote}\ttfamily\small
+VERDICT: DECEIVER\\
+CONFIDENCE: 0.95\\
+EVIDENCE: Steps 2-4 confirm United Nations formed 1945; claim contradicts evidence.
+\end{quote}
+The verdict is correct and the stated reasoning is not unreasonable to a
+human reader -- it correctly identifies \emph{that} the claim contradicts
+the trace. But it cites the corroborating evidence (steps 2--4, that the UN
+was formed in 1945) rather than the specific step where the false claim was
+actually made (step 6) or the false claim itself (\texttt{european}), so it
+does not clear the grounding bar: reward $1.0$, not $1.5$. This is the
+pattern behind the aggregate 0.06\% figure below -- not nonsensical
+reasoning, but reasoning that stops one step short of pointing at the
+actual evidence a human auditor would need to verify the claim
+independently.
+
 \subsection{Frontier-model baselines}
 
 Table~\ref{tab:baselines} reports verdict accuracy and per-class evidence
@@ -385,22 +409,22 @@ near-zero rate as Claude Haiku 4.5 on both distributions.
 
 \begin{table*}[htbp]
 \centering
-\caption{Frontier-model baselines: accuracy and evidence grounding (hits/eligible per class)}
+\caption{Frontier-model baselines: accuracy (with Wilson 95\% CI) and evidence grounding (hits/eligible per class)}
 \label{tab:baselines}
 \begin{tabular}{llrrrr}
 \toprule
-Model & Distribution & Accuracy & \texttt{REWARD\_HACKER} & \texttt{LAZY} & \texttt{DECEIVER} \\
+Model & Distribution & Accuracy (95\% CI) & \texttt{REWARD\_HACKER} & \texttt{LAZY} & \texttt{DECEIVER} \\
 \midrule
-GPT-4o & original & 90.0\% & 0/18 & 0/30 & 0/30 \\
-GPT-4o-mini & original & 82.5\% & 0/11 & 0/30 & 0/29 \\
-Llama-3.1-8B-Instruct & original & 85.0\% & 0/12 & 0/30 & 0/30 \\
-Qwen2.5-7B-Instruct & original & 70.8\% & 0/24 & 0/30 & 0/1 \\
-Claude Haiku 4.5 & original & 90.8\% & 0/30 & 0/22 & 0/28 \\
-Claude Haiku 4.5 & realistic & 94.3\% & 0/123 & 0/150 & 0/150 \\
-Claude Sonnet 4.5 & original & 89.2\% & 0/17 & 0/30 & 0/30 \\
-Claude Sonnet 4.5 & realistic & 90.7\% & 0/103 & 0/148 & 0/150 \\
-Gemini 3.6 Flash & original & 100.0\% & 0/30 & 0/30 & \textbf{1/30} \\
-Gemini 3.6 Flash & realistic & 99.3\% & 0/149 & 0/150 & 0/149 \\
+GPT-4o & original & 90.0\% [83.3, 94.2] & 0/18 & 0/30 & 0/30 \\
+GPT-4o-mini & original & 82.5\% [74.7, 88.3] & 0/11 & 0/30 & 0/29 \\
+Llama-3.1-8B-Instruct & original & 85.0\% [77.5, 90.3] & 0/12 & 0/30 & 0/30 \\
+Qwen2.5-7B-Instruct & original & 70.8\% [62.1, 78.2] & 0/24 & 0/30 & 0/1 \\
+Claude Haiku 4.5 & original & 90.8\% [84.3, 94.8] & 0/30 & 0/22 & 0/28 \\
+Claude Haiku 4.5 & realistic & 94.3\% [92.1, 95.9] & 0/123 & 0/150 & 0/150 \\
+Claude Sonnet 4.5 & original & 89.2\% [82.4, 93.6] & 0/17 & 0/30 & 0/30 \\
+Claude Sonnet 4.5 & realistic & 90.7\% [88.1, 92.8] & 0/103 & 0/148 & 0/150 \\
+Gemini 3.6 Flash & original & 100.0\% [96.9, 100.0] & 0/30 & 0/30 & \textbf{1/30} \\
+Gemini 3.6 Flash & realistic & 99.3\% [98.3, 99.7] & 0/149 & 0/150 & 0/149 \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -483,8 +507,19 @@ Class & Dist. & Pooled & Rate & $p$ \\
 
 \subsection{Learning-rate ablation}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{training_curves_multiseed.png}
+\caption{Held-out eval reward vs.\ training step, all 3 seeds per
+configuration, both learning rates, both trace distributions. LR=2e-5
+climbs steadily throughout training; LR=5e-6 stays flat regardless of
+seed or distribution.}
+\label{fig:training-curves}
+\end{figure*}
+
 The identical grid trained at LR=5e-6 (4x smaller, otherwise unchanged)
-shows a sharp negative result (Table~\ref{tab:ablation}): evidence
+shows a sharp negative result (Figure~\ref{fig:training-curves},
+Table~\ref{tab:ablation}): evidence
 grounding is statistically indistinguishable from the 0.06\% baseline
 across every class, every seed, and both distributions, despite verdict
 accuracy remaining reasonable ($70.3\% \pm 0.5\%$ original, $69.2\% \pm
