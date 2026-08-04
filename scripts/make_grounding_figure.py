@@ -51,17 +51,18 @@ for ax, (dist_name, dist_label) in zip(
     # above the x-axis line so it never sits on top of the tick labels below it.
     for i, v in enumerate(baseline_vals):
         ax.annotate(f"{v:.2g}%" if v > 0 else "0%", xy=(i - width / 2 - bar_gap / 2, 3),
-                    ha="center", va="bottom", fontsize=7.5, color="#555555")
+                    ha="center", va="bottom", fontsize=10, color="#555555")
 
     ax.set_xticks(x)
-    ax.set_xticklabels(["REWARD\nHACKER", "LAZY", "DECEIVER"])
-    ax.set_title(dist_label, fontsize=11)
+    ax.set_xticklabels(["REWARD\nHACKER", "LAZY", "DECEIVER"], fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
+    ax.set_title(dist_label, fontsize=15)
     ax.set_ylim(0, 100)
     ax.set_xlim(-0.6, len(CLASSES) - 1 + 0.6)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-axes[0].set_ylabel("Evidence-bonus hit rate (%)\n(among correctly-classified verdicts)")
+axes[0].set_ylabel("Evidence-bonus hit rate (%)\n(among correctly-classified verdicts)", fontsize=13)
 
 # Short, purely-vertical annotation anchored directly above the empty
 # REWARD_HACKER column in the realistic panel -- avoids the earlier diagonal
@@ -69,13 +70,13 @@ axes[0].set_ylabel("Evidence-bonus hit rate (%)\n(among correctly-classified ver
 axes[1].annotate(
     "metric undefined here:\nmodel rarely classifies this\nclass correctly on realistic traces",
     xy=(0, 3), xytext=(0, 30),
-    ha="center", va="bottom", fontsize=7.5, color="#555555",
+    ha="center", va="bottom", fontsize=10.5, color="#555555",
     arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8,
                      connectionstyle="arc3,rad=0"),
 )
 
 handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.04), ncol=2, frameon=False, fontsize=9)
+fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.04), ncol=2, frameon=False, fontsize=13)
 
 fig.tight_layout(rect=[0, 0, 1, 0.93])
 
