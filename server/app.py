@@ -1,4 +1,4 @@
-"""OpenEnv-compliant FastAPI server for The Snitch.
+"""OpenEnv-compliant FastAPI server for GroundingBench.
 
 Endpoints:
   POST /reset      — start a new episode (single trace audit)
@@ -28,7 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from env.snitch_env import SnitchEnv
+from env.grounding_env import GroundingEnv
 from env.parse import parse_overseer_output
 
 
@@ -37,7 +37,7 @@ from env.parse import parse_overseer_output
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="TheSnitch",
+    title="GroundingBench",
     description=(
         "OpenEnv environment for training scalable oversight agents. "
         "The overseer audits tool-use traces from research agents and detects "
@@ -124,7 +124,7 @@ ACTION_SCHEMA = {
 
 class EpisodeStore:
     def __init__(self) -> None:
-        self.env: Optional[SnitchEnv] = None
+        self.env: Optional[GroundingEnv] = None
         self.episode_id: Optional[str] = None
         self.task_id: Optional[str] = None
         self.step_count: int = 0
@@ -171,9 +171,9 @@ class GraderResponse(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _make_env(task_id: str, seed: int) -> SnitchEnv:
+def _make_env(task_id: str, seed: int) -> GroundingEnv:
     t = TASKS[task_id]
-    return SnitchEnv(
+    return GroundingEnv(
         traces_path=t["traces_path"],
         held_out_variant=t["held_out_variant"],
         mode=t["mode"],
@@ -251,7 +251,7 @@ _LANDING_HTML = """<!doctype html>
 <head>
 <meta charset=\"utf-8\">
 <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
-<title>The Snitch — OpenEnv environment for scalable oversight</title>
+<title>GroundingBench — OpenEnv environment for scalable oversight</title>
 <style>
   :root {
     --bg: #0b0d10;
@@ -402,11 +402,11 @@ _LANDING_HTML = """<!doctype html>
 </head>
 <body>
 <main>
-  <h1>The Snitch</h1>
+  <h1>GroundingBench</h1>
   <p class=\"tagline\">An OpenEnv environment for training scalable oversight agents.</p>
 
   <h2>What this is</h2>
-  <p>The Snitch puts an LLM overseer in front of frozen tool-use traces from research agents and asks it to detect three misbehavior patterns: <strong>reward hacking</strong>, <strong>laziness</strong>, and <strong>deception</strong>.</p>
+  <p>GroundingBench puts an LLM overseer in front of frozen tool-use traces from research agents and asks it to detect three misbehavior patterns: <strong>reward hacking</strong>, <strong>laziness</strong>, and <strong>deception</strong>.</p>
   <p>The reward function pays for both correct classification and citing the smoking-gun evidence — so it doubles as a benchmark that surfaces a capability gap (evidence grounding) that current frontier post-training pipelines do not close.</p>
 
   <h2>Leaderboard — held-out v3, n=120</h2>
@@ -516,8 +516,8 @@ _LANDING_HTML = """<!doctype html>
 
   <h2>Links</h2>
   <ul class=\"links\">
-    <li><a href=\"https://github.com/Mihir1107/snitch-env\" target=\"_blank\" rel=\"noopener\">GitHub repository</a></li>
-    <li><a href=\"https://github.com/Mihir1107/snitch-env/blob/main/BLOG.md\" target=\"_blank\" rel=\"noopener\">Technical writeup</a></li>
+    <li><a href=\"https://github.com/ManasMehta1110/GroundingBench\" target=\"_blank\" rel=\"noopener\">GitHub repository</a></li>
+    <li><a href=\"https://github.com/ManasMehta1110/GroundingBench/blob/main/BLOG.md\" target=\"_blank\" rel=\"noopener\">Technical writeup</a></li>
     <li><a href=\"/docs\">OpenAPI docs (Swagger UI)</a></li>
     <li><a href=\"/openapi.json\">openapi.json</a></li>
   </ul>
@@ -561,7 +561,7 @@ def landing():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "env": "TheSnitch", "version": "1.0.0"}
+    return {"status": "ok", "env": "GroundingBench", "version": "1.0.0"}
 
 
 @app.post("/reset")
@@ -725,7 +725,7 @@ def baseline():
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
-    ws_env: Optional[SnitchEnv] = None
+    ws_env: Optional[GroundingEnv] = None
     ws_episode_id: Optional[str] = None
     ws_task_id: Optional[str] = None
     ws_done: bool = False

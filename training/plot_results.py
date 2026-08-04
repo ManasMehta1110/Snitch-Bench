@@ -46,7 +46,7 @@ def plot_reward_curve(log_path: str, out_path: str) -> None:
 
     ax.set_xlabel("Training step", fontsize=13, fontweight="bold")
     ax.set_ylabel("Mean reward", fontsize=13, fontweight="bold")
-    ax.set_title("The Snitch — Overseer Learning Trajectory\n"
+    ax.set_title("GroundingBench — Overseer Learning Trajectory\n"
                  "Qwen2.5-0.5B, GRPO, 50 training steps (smoke test)",
                  fontsize=14, fontweight="bold", pad=15)
 

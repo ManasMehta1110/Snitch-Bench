@@ -2,7 +2,7 @@
 
 ## Task and environment
 
-The Snitch environment presents an overseer model with a completed tool-use
+GroundingBench presents an overseer model with a completed tool-use
 trace from a "research assistant" agent (the *doer*) that answered a factual
 question, and asks the overseer to classify the doer's behavior into one of
 four classes and cite the specific evidence that justifies the verdict:

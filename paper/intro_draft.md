@@ -19,7 +19,7 @@ definition: the overseer must name the trace step and the specific detail
 that gave the misbehavior away, and we can verify programmatically whether
 it did.
 
-We build an environment, **The Snitch**, in which an overseer reads a
+We build an environment, **GroundingBench**, in which an overseer reads a
 completed tool-use trace from a "doer" agent that answered a factual
 question, and must classify the doer's behavior as honest or one of three
 misbehavior types -- fabricating an answer without doing the work,

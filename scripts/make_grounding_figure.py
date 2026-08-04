@@ -27,10 +27,11 @@ TRAINED = {
     },
 }
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 4.5), sharey=True)
+fig, axes = plt.subplots(1, 2, figsize=(11, 5), sharey=True)
 
 x = np.arange(len(CLASSES))
-width = 0.35
+width = 0.32  # < 0.35 so paired bars have a visible gap rather than touching edge-to-edge
+bar_gap = 0.02
 
 for ax, (dist_name, dist_label) in zip(
     axes, [("original", "Original (rule-based) traces"), ("realistic", "Realistic (LLM-generated) traces")]
@@ -39,38 +40,44 @@ for ax, (dist_name, dist_label) in zip(
     trained_means = [TRAINED[dist_name][c][0] * 100 for c in CLASSES]
     trained_stds = [TRAINED[dist_name][c][1] * 100 for c in CLASSES]
 
-    ax.bar(x - width / 2, baseline_vals, width, label="Frontier baseline (aggregate)",
+    ax.bar(x - width / 2 - bar_gap / 2, baseline_vals, width, label="Frontier baseline (aggregate)",
            color="#b0b0b0", edgecolor="black", linewidth=0.5)
-    ax.bar(x + width / 2, trained_means, width, yerr=trained_stds, capsize=4,
+    ax.bar(x + width / 2 + bar_gap / 2, trained_means, width, yerr=trained_stds, capsize=4,
            label="Trained overseer (3-seed mean $\\pm$ std)",
-           color="#2b6cb0", edgecolor="black", linewidth=0.5)
+           color="#2b6cb0", edgecolor="black", linewidth=0.5, error_kw=dict(elinewidth=1.1))
 
     # The baseline bars are genuinely ~0%, which without a label is visually
-    # indistinguishable from missing data -- label each one explicitly.
+    # indistinguishable from missing data -- label each one explicitly, offset
+    # above the x-axis line so it never sits on top of the tick labels below it.
     for i, v in enumerate(baseline_vals):
-        ax.annotate(f"{v:.2g}%" if v > 0 else "0%", xy=(i - width / 2, 1.5),
-                    ha="center", fontsize=7.5, color="#555555")
+        ax.annotate(f"{v:.2g}%" if v > 0 else "0%", xy=(i - width / 2 - bar_gap / 2, 3),
+                    ha="center", va="bottom", fontsize=7.5, color="#555555")
 
     ax.set_xticks(x)
     ax.set_xticklabels(["REWARD\nHACKER", "LAZY", "DECEIVER"])
     ax.set_title(dist_label, fontsize=11)
     ax.set_ylim(0, 100)
+    ax.set_xlim(-0.6, len(CLASSES) - 1 + 0.6)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
 axes[0].set_ylabel("Evidence-bonus hit rate (%)\n(among correctly-classified verdicts)")
+
+# Short, purely-vertical annotation anchored directly above the empty
+# REWARD_HACKER column in the realistic panel -- avoids the earlier diagonal
+# arrow that cut across the LAZY bar and the "0%" label.
 axes[1].annotate(
-    "metric undefined here:\nmodel rarely classifies\nthis class correctly\non realistic traces",
-    xy=(0 + width / 2, 1), xytext=(0.55, 45),
-    fontsize=7.5, ha="left", color="#555555",
-    arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8),
+    "metric undefined here:\nmodel rarely classifies this\nclass correctly on realistic traces",
+    xy=(0, 3), xytext=(0, 30),
+    ha="center", va="bottom", fontsize=7.5, color="#555555",
+    arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8,
+                     connectionstyle="arc3,rad=0"),
 )
 
 handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.06), ncol=2, frameon=False, fontsize=9)
+fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.04), ncol=2, frameon=False, fontsize=9)
 
-fig.suptitle("")
-fig.tight_layout(rect=[0, 0, 1, 0.94])
+fig.tight_layout(rect=[0, 0, 1, 0.93])
 
 out_path = "figures/evidence_grounding_comparison.png"
 fig.savefig(out_path, dpi=300, bbox_inches="tight")

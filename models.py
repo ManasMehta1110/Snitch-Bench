@@ -1,4 +1,4 @@
-"""Pydantic models for The Snitch environment.
+"""Pydantic models for the GroundingBench environment.
 
 Exports data structures for observations, actions, rewards, and episode state.
 Used by both the server and any client connecting to the env.

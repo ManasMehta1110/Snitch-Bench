@@ -1,6 +1,6 @@
-"""Example Python client for The Snitch environment.
+"""Example Python client for GroundingBench environment.
 
-Demonstrates how to connect to a running Snitch env (local or HF Space) and
+Demonstrates how to connect to a running GroundingBench env (local or HF Space) and
 audit traces using an LLM. Can be used as a reference for training scripts.
 
 Usage:
@@ -16,7 +16,7 @@ from typing import Any
 import requests
 
 
-class SnitchClient:
+class GroundingClient:
     def __init__(self, base_url: str = "http://localhost:7860", timeout: float = 30.0):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
@@ -78,7 +78,7 @@ def dummy_verdict(observation: dict[str, Any]) -> str:
     )
 
 
-def run_episodes(client: SnitchClient, task_id: str, n: int, seed: int) -> list[dict]:
+def run_episodes(client: GroundingClient, task_id: str, n: int, seed: int) -> list[dict]:
     results = []
     for i in range(n):
         reset_resp = client.reset(task_id=task_id, seed=seed + i)
@@ -105,7 +105,7 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
 
-    client = SnitchClient(base_url=args.url)
+    client = GroundingClient(base_url=args.url)
     try:
         health = client.health()
         print(f"Connected: {health}")

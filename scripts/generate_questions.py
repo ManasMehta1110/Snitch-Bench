@@ -1,4 +1,4 @@
-"""Generate synthetic research questions + corpora for SnitchEnv training.
+"""Generate synthetic research questions + corpora for GroundingEnv training.
 
 Uses OpenAI gpt-4o in batch mode. Produces JSON matching the schema expected
 by doer policies, including plausible_wrong_answers for REWARD_HACKER and DECEIVER.

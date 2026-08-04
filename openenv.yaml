@@ -1,4 +1,4 @@
-name: TheSnitch
+name: GroundingBench
 version: "1.0.0"
 description: >
   Scalable oversight environment for LLM agent fleets. The overseer audits
@@ -16,7 +16,7 @@ tags:
   - reinforcement-learning
 
 authors:
-  - InfraNova
+  - Manas Mehta
 
 observation_space:
   type: object

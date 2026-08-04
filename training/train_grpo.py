@@ -1,4 +1,4 @@
-"""GRPO training for The Snitch overseer. TRL 1.2+ compatible."""
+"""GRPO training for the GroundingBench overseer. TRL 1.2+ compatible."""
 from __future__ import annotations
 
 import sys
@@ -32,7 +32,7 @@ from env.trace_format import Trace
 # The README headline numbers (Qwen2.5-1.5B-Instruct, LR=2e-5, 400 steps,
 # max_completion_length=256, 75.8% on held-out v3) were produced by
 # `scripts/train_easy_only.py` invoked from the Colab notebook
-# (notebooks/snitch_train_full_proof.ipynb). The notebook patches
+# (notebooks/grounding_train_full_proof.ipynb). The notebook patches
 # train_easy_only.py to MODEL_NAME=Qwen/Qwen2.5-1.5B-Instruct and
 # LEARNING_RATE=2e-5 before running.
 #

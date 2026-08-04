@@ -1,5 +1,5 @@
 ---
-title: The Snitch
+title: GroundingBench
 emoji: 🕵️
 colorFrom: indigo
 colorTo: purple
@@ -8,7 +8,7 @@ pinned: false
 license: mit
 ---
 
-# The Snitch: Measuring Evidence-Grounded AI Oversight
+# GroundingBench: Measuring Evidence-Grounded AI Oversight
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](pyproject.toml)
@@ -201,8 +201,8 @@ classification behavior.
 ## Installation
 
 ```bash
-git clone https://github.com/ManasMehta1110/Snitch-Bench.git
-cd Snitch-Bench
+git clone https://github.com/ManasMehta1110/GroundingBench.git
+cd GroundingBench
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -270,11 +270,11 @@ tests/        environment correctness tests
 ## Citation
 
 ```bibtex
-@misc{snitch2026,
-  title        = {The Snitch: Measuring Evidence-Grounded AI Oversight},
+@misc{groundingbench2026,
+  title        = {GroundingBench: Measuring Evidence-Grounded AI Oversight},
   author       = {Mehta, Manas},
   year         = {2026},
-  howpublished = {\url{https://github.com/ManasMehta1110/Snitch-Bench}},
+  howpublished = {\url{https://github.com/ManasMehta1110/GroundingBench}},
   note         = {Preprint in preparation, target venue IEEE SaTML 2027}
 }
 ```

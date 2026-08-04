@@ -1,4 +1,4 @@
-"""GRPO training for The Snitch overseer. TRL 1.2+ compatible."""
+"""GRPO training for the GroundingBench overseer. TRL 1.2+ compatible."""
 from __future__ import annotations
 
 import sys

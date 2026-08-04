@@ -4099,7 +4099,7 @@ wheels = [
 ]
 
 [[package]]
-name = "snitch-env"
+name = "grounding-bench"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [

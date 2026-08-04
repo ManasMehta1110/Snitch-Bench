@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "snitch-env"
+name = "grounding-bench"
 version = "1.0.0"
 description = "Scalable oversight environment for LLM agent fleets"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-  { name = "InfraNova" },
+  { name = "Manas Mehta" },
 ]
 dependencies = [
   "fastapi>=0.110",
@@ -44,5 +44,5 @@ training = [
 include = ["env*", "doers*"]
 
 [tool.openenv]
-env_id = "TheSnitch-v0"
+env_id = "GroundingBench-v0"
 entry_point = "server:app"

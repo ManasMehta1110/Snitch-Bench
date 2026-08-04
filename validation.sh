@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validation.sh — validate The Snitch OpenEnv submission.
+# validation.sh — validate the GroundingBench OpenEnv submission.
 # Usage: ./validation.sh <hf_space_url> [repo_dir]
 
 set -uo pipefail
@@ -25,7 +25,7 @@ pass() { log "${GREEN}PASSED${NC} -- $1"; }
 fail() { log "${RED}FAILED${NC} -- $1"; }
 stop() { printf "\n${RED}${BOLD}Stopped at %s.${NC}\n" "$1"; exit 1; }
 
-printf "\n${BOLD}==== Snitch Validator ====${NC}\n"
+printf "\n${BOLD}==== GroundingBench Validator ====${NC}\n"
 log "Repo: $REPO_DIR"
 log "Ping: $PING_URL"
 printf "\n"

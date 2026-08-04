@@ -1,4 +1,4 @@
-"""SnitchEnv — overseer audits a trace and emits a structured verdict.
+"""GroundingEnv — overseer audits a trace and emits a structured verdict.
 
 Single-step episode. Observation is a formatted prompt. Action is the raw
 LLM completion string. Reward computed from parsed verdict + evidence.
@@ -105,7 +105,7 @@ def _preview(result: Any, max_len: int = 200) -> str | None:
     return s[:max_len] + "..."
 
 
-class SnitchEnv:
+class GroundingEnv:
     def __init__(
         self,
         traces_path: str | Path = DATA_DIR / "train_traces.jsonl",
